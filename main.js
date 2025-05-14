@@ -38,32 +38,77 @@ function showMessage(message) {
     window.setTimeout(() => window.alert(message), 50);
 }
 
+// function receiveMoves(board, websocket) {
+//     websocket.addEventListener("message", ({ data }) => {
+//         const event = JSON.parse(data);
+//         switch (event.type) {
+//             case "init":
+//                 // create links for inviting the second player and spectators
+//                 document.querySelector(".join").href = "?join=" + event.join;
+//                 document.querySelector(".watch").href = "?watch=" + event.watch;
+//                 break;
+//             case "play":
+//                 // update UI with move.
+//                 playMove(board, event.player, event.column, event.row);
+//                 break;
+//             case "win":
+//                 showMessage(`player ${event.player} wins!`);
+//                 // No further messages are expected; close WebSocket connection.
+//                 websocket.close(1000);
+//                 break;
+//             case "error":
+//                 showMessage(event.message);
+//                 break;
+//             default:
+//                 throw new Error(`Unknown event type: ${event.type}.`);
+//         }
+//     });
+// }
+
 function receiveMoves(board, websocket) {
     websocket.addEventListener("message", ({ data }) => {
-        const event = JSON.parse(data);
-        switch (event.type) {
-            case "init":
-                // create links for inviting the second player and spectators
-                document.querySelector(".join").href = "?join=" + event.join;
-                document.querySelector(".watch").href = "?watch=" + event.watch;
-                break;
-            case "play":
-                // update UI with move.
-                playMove(board, event.player, event.column, event.row);
-                break;
-            case "win":
-                showMessage(`player ${event.player} wins!`);
-                // No further messages are expected; close WebSocket connection.
-                websocket.close(1000);
-                break;
-            case "error":
-                showMessage(event.message);
-                break;
-            default:
-                throw new Error(`Unknown event type: ${event.type}.`);
-        }
+      const event = JSON.parse(data);
+      switch (event.type) {
+        case "init":
+          // Update links with join/watch query params
+          const joinLink = document.querySelector(".join");
+          const watchLink = document.querySelector(".watch");
+  
+          joinLink.href = "?join=" + event.join;
+          watchLink.href = "?watch=" + event.watch;
+  
+          // Prevent default behavior to avoid GitHub Pages 404
+          joinLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.search = "?join=" + event.join;
+          });
+  
+          watchLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.search = "?watch=" + event.watch;
+          });
+  
+          break;
+  
+        case "play":
+          // Update UI with move
+          playMove(board, event.player, event.column, event.row);
+          break;
+  
+        case "win":
+          showMessage(`player ${event.player} wins!`);
+          websocket.close(1000);
+          break;
+  
+        case "error":
+          showMessage(event.message);
+          break;
+  
+        default:
+          throw new Error(`Unknown event type: ${event.type}.`);
+      }
     });
-}
+  }
 
 function sendMoves(board, websocket) {
     // don't send moves for a spectator watching a game.
