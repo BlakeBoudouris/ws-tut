@@ -1,5 +1,19 @@
 import { createBoard, playMove } from "./connect4.js";
 
+function getWebSocketServer() {
+    //if (window.location.host === "BlakeBoudouris.github.io") {
+    if (host.includes("github.io")) { 
+        return "wss://hot-verla-blakeboudouris-80e04535.koyeb.app/";
+    }
+    else if (window.location.host === "localhost:8000") {
+        return "ws://localhost:8001/";
+    }
+    else {
+        throw new Error(`Unsupported host: ${window.location.host}`);
+    }
+}
+
+
 function initGame(websocket) {
     websocket.addEventListener("open", () => {
         // Send "init" event according to who is connecting.
@@ -71,19 +85,6 @@ function sendMoves(board, websocket) {
         websocket.send(JSON.stringify(event));
     });
 }
-
-function getWebSocketServer() {
-    if (window.location.host === "BlakeBoudouris.github.io") {
-        return "wss://hot-verla-blakeboudouris-80e04535.koyeb.app/";
-    }
-    else if (window.location.host === "localhost:8000") {
-        return "ws://localhost:8001/";
-    }
-    else {
-        throw new Error(`Unsupported host: ${window.location.host}`);
-    }
-}
-
 
 
 window.addEventListener("DOMContentLoaded", () => {
