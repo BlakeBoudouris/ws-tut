@@ -68,30 +68,35 @@ function showMessage(message) {
 function receiveMoves(board, websocket) {
     websocket.addEventListener("message", ({ data }) => {
       const event = JSON.parse(data);
+  
       switch (event.type) {
-        case "init":
-          // Update links with join/watch query params
+        case "init": {
           const joinLink = document.querySelector(".join");
           const watchLink = document.querySelector(".watch");
   
-          joinLink.href = "?join=" + event.join;
-          watchLink.href = "?watch=" + event.watch;
+          const joinURL = "?join=" + event.join;
+          const watchURL = "?watch=" + event.watch;
   
-          // Prevent default behavior to avoid GitHub Pages 404
+          joinLink.href = joinURL;
+          watchLink.href = watchURL;
+  
+          // Prevent full-page reload and use pushState to update URL
           joinLink.addEventListener("click", (e) => {
             e.preventDefault();
-            window.location.search = "?join=" + event.join;
+            history.pushState({}, "", joinURL);
+            websocket.send(JSON.stringify({ type: "init", join: event.join }));
           });
   
           watchLink.addEventListener("click", (e) => {
             e.preventDefault();
-            window.location.search = "?watch=" + event.watch;
+            history.pushState({}, "", watchURL);
+            websocket.send(JSON.stringify({ type: "init", watch: event.watch }));
           });
   
           break;
+        }
   
         case "play":
-          // Update UI with move
           playMove(board, event.player, event.column, event.row);
           break;
   
