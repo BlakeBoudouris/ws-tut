@@ -69,48 +69,38 @@ function receiveMoves(board, websocket) {
     websocket.addEventListener("message", ({ data }) => {
       const event = JSON.parse(data);
   
-      switch (event.type) {
-        case "init": {
-          const joinLink = document.querySelector(".join");
-          const watchLink = document.querySelector(".watch");
+      if (event.type === "init") {
+        const joinLink = document.querySelector(".join");
+        const watchLink = document.querySelector(".watch");
   
-          const joinURL = "?join=" + event.join;
-          const watchURL = "?watch=" + event.watch;
+        joinLink.href = "?join=" + event.join;
+        watchLink.href = "?watch=" + event.watch;
   
-          joinLink.href = joinURL;
-          watchLink.href = watchURL;
+        // Prevent navigation, just handle game logic
+        joinLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          history.pushState({}, "", joinLink.href);
+          websocket.send(JSON.stringify({ type: "init", join: event.join }));
+        });
   
-          // Prevent full-page reload and use pushState to update URL
-          joinLink.addEventListener("click", (e) => {
-            e.preventDefault();
-            history.pushState({}, "", joinURL);
-            websocket.send(JSON.stringify({ type: "init", join: event.join }));
-          });
+        watchLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          history.pushState({}, "", watchLink.href);
+          websocket.send(JSON.stringify({ type: "init", watch: event.watch }));
+        });
+      }
   
-          watchLink.addEventListener("click", (e) => {
-            e.preventDefault();
-            history.pushState({}, "", watchURL);
-            websocket.send(JSON.stringify({ type: "init", watch: event.watch }));
-          });
+      if (event.type === "play") {
+        playMove(board, event.player, event.column, event.row);
+      }
   
-          break;
-        }
+      if (event.type === "win") {
+        showMessage(`player ${event.player} wins!`);
+        websocket.close(1000);
+      }
   
-        case "play":
-          playMove(board, event.player, event.column, event.row);
-          break;
-  
-        case "win":
-          showMessage(`player ${event.player} wins!`);
-          websocket.close(1000);
-          break;
-  
-        case "error":
-          showMessage(event.message);
-          break;
-  
-        default:
-          throw new Error(`Unknown event type: ${event.type}.`);
+      if (event.type === "error") {
+        showMessage(event.message);
       }
     });
   }
