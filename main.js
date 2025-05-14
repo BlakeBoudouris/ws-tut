@@ -67,41 +67,69 @@ function showMessage(message) {
 
 function receiveMoves(board, websocket) {
     websocket.addEventListener("message", ({ data }) => {
-      const event = JSON.parse(data);
+        const event = JSON.parse(data);
   
-      if (event.type === "init") {
-        const joinLink = document.querySelector(".join");
-        const watchLink = document.querySelector(".watch");
+    //   if (event.type === "init") {
+    //     const joinLink = document.querySelector(".join");
+    //     const watchLink = document.querySelector(".watch");
   
-        joinLink.href = "?join=" + event.join;
-        watchLink.href = "?watch=" + event.watch;
+    //     joinLink.href = "?join=" + event.join;
+    //     watchLink.href = "?watch=" + event.watch;
   
-        // Prevent navigation, just handle game logic
-        joinLink.addEventListener("click", (e) => {
-          e.preventDefault();
-          history.pushState({}, "", joinLink.href);
-          websocket.send(JSON.stringify({ type: "init", join: event.join }));
-        });
+    //     // Prevent navigation, just handle game logic
+    //     joinLink.addEventListener("click", (e) => {
+    //       e.preventDefault();
+    //       history.pushState({}, "", joinLink.href);
+    //       websocket.send(JSON.stringify({ type: "init", join: event.join }));
+    //     });
   
-        watchLink.addEventListener("click", (e) => {
-          e.preventDefault();
-          history.pushState({}, "", watchLink.href);
-          websocket.send(JSON.stringify({ type: "init", watch: event.watch }));
-        });
-      }
+    //     watchLink.addEventListener("click", (e) => {
+    //       e.preventDefault();
+    //       history.pushState({}, "", watchLink.href);
+    //       websocket.send(JSON.stringify({ type: "init", watch: event.watch }));
+    //     });
+    //   }
+
+        if (event.type === "init") {
+            const newLink = document.querySelector(".new");
+            const joinLink = document.querySelector(".join");
+            const watchLink = document.querySelector(".watch");
+        
+            joinLink.href = "?join=" + event.join;
+            watchLink.href = "?watch=" + event.watch;
+            newLink.href = "/"; // or just `"#"` to prevent reload
+        
+            newLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            history.pushState({}, "", "/");
+            websocket.send(JSON.stringify({ type: "init" }));
+            });
+        
+            joinLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            history.pushState({}, "", joinLink.href);
+            websocket.send(JSON.stringify({ type: "init", join: event.join }));
+            });
+        
+            watchLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            history.pushState({}, "", watchLink.href);
+            websocket.send(JSON.stringify({ type: "init", watch: event.watch }));
+            });
+        }   
   
-      if (event.type === "play") {
-        playMove(board, event.player, event.column, event.row);
-      }
-  
-      if (event.type === "win") {
-        showMessage(`player ${event.player} wins!`);
-        websocket.close(1000);
-      }
-  
-      if (event.type === "error") {
-        showMessage(event.message);
-      }
+        if (event.type === "play") {
+            playMove(board, event.player, event.column, event.row);
+        }
+
+        if (event.type === "win") {
+            showMessage(`player ${event.player} wins!`);
+            websocket.close(1000);
+        }
+
+        if (event.type === "error") {
+            showMessage(event.message);
+        }
     });
   }
 
