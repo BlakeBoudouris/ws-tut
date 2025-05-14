@@ -2,7 +2,7 @@ import { createBoard, playMove } from "./connect4.js";
 
 function getWebSocketServer() {
     //if (window.location.host === "BlakeBoudouris.github.io") {
-    if (host.includes("github.io")) { 
+    if (window.location.host.includes("github.io")) { 
         // test comment 17493c7f4390fa7f7b0c6a0f118430aefc1255e6
         return "wss://embarrassed-clementia-blakeboudouris-10059ec4.koyeb.app/";
     }
