@@ -3,7 +3,8 @@ import { createBoard, playMove } from "./connect4.js";
 function getWebSocketServer() {
     //if (window.location.host === "BlakeBoudouris.github.io") {
     if (host.includes("github.io")) { 
-        return "wss://hot-verla-blakeboudouris-80e04535.koyeb.app/";
+        // test comment
+        return "embarrassed-clementia-blakeboudouris-10059ec4.koyeb.app/";
     }
     else if (window.location.host === "localhost:8000") {
         return "ws://localhost:8001/";
