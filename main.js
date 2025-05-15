@@ -1,7 +1,7 @@
 import { createBoard, playMove } from "./connect4.js";
 
 function getWebSocketServer() {
-  if (window.location.host === "BlakeBoudouris.github.io") {
+  if (window.location.host === "blakeboudouris.github.io") {
     return "wss://embarrassed-clementia-blakeboudouris-10059ec4.koyeb.app/";
   } else if (window.location.host === "localhost:8000") {
     return "ws://localhost:8001/";
